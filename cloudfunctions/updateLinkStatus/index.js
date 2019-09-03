@@ -32,20 +32,6 @@ exports.main = async(event, context) => {
    * 2.更新任务表，消费数+1
    * 3.更新用户表，更新tasklineid
    */
-
-  //  return await db.collection('task_line').add({
-  //   data: {
-  //     consumers:'23',
-  //     nums: 0,
-  //   }
-  // }).then(res => {
-  //   return Promise.resolve(res._id)
-  // })
-  //新增table,记录id
-  // var staskLineId = await addTaskLine("sdd")
-  // return console.log('新增table,记录id:' + staskLineId)
-
-
   try {
     userIconList = (await db.collection('userinfo_table').where({
       openid: openId
@@ -79,29 +65,19 @@ exports.main = async(event, context) => {
     }).field({
       status: true
     }).get()).data[0].status;
-
     console.log('consume_num:' + consumed_num + 'status::' + task_table_status + 'taskLine_consumed_num::' + taskLine_consumed_num)
-
-
-
-    //待考虑
-    // if (task_table_status == 'created' && taskLineId == '') {
-    //   //新增table,记录id
-    //   taskLineId = addTaskLine(info)
-    //   console.log('新增table,记录id:' + taskLineId)
-    // }
 
     switch (action) {
 
       case 'passOn':
         {
+          //链路传递数量大于等于上限，返回空值
           if (taskLine_consumed_num >= MAX_CURRENT_LINE_NUM) {
             return null
           } else {
             await changeLinkStatus('passing', link_id);
             await updateTaskLine(link_id, info);
           }
-
           break;
         }
 
@@ -242,9 +218,9 @@ async function getTaskPublisher(taskId){
 
 /**
  * 踢人
- * 1.鏈路消費減一
- * 2.用戶table 去掉
- * 3.鏈路consumer 刪掉
+ * 1.链路消费减法一
+ * 2.更新用戶table 
+ * 3.更新链路consumers-刪掉
  * 
  */
 async function kickUser(kickUserId, kickTaskLine) {

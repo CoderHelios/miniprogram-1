@@ -29,16 +29,13 @@ exports.main = async(event, context) => {
     openid: openId,
   }
   if (consumed_num < 10) {
-
-
     switch (event.action) {
       //放到addtaskline，更新tasktable加一
       case 'join':
         {
           var add_taskline_id = await addTaskLine('passing', info, task_id)
           console.log('join:' + add_taskline_id)
-          updateTaskTableAddNum(task_id)
-          updateUserTableAddtaskLineid(openId, add_taskline_id);
+          updateTaskAndLine(task_id, openId, add_taskline_id);
           break;
         }
         //放到addtaskline，更新tasktable加一
@@ -46,20 +43,9 @@ exports.main = async(event, context) => {
         {
           var add_taskline_id = await addTaskLine('suspect', info, task_id);
           console.log('showUp:' + add_taskline_id)
-          await updateTaskTableAddNum(task_id);
-          await updateUserTableAddtaskLineid(openId, add_taskline_id);
+          updateTaskAndLine(task_id, openId, add_taskline_id);
           let session_id = await createSession(task_id, add_taskline_id, openId)
-          //begin
-          await db.collection('message').add({
-            data:{
-              openid: (await db.collection('task_table').where({
-                _id: task_id
-              }).get()).data[0].publisher_id,
-              type: "chatInvite",
-              session_id
-            }
-          })
-          //end
+          await updateMessageById(task_id, session_id);
           break;
         }
     }
@@ -69,6 +55,24 @@ exports.main = async(event, context) => {
   } else {
     return null
   }
+}
+
+async function updateMessageById(task_id, session_id) {
+  await db.collection('message').add({
+    data: {
+      openid: (await db.collection('task_table').where({
+        _id: task_id
+      }).get()).data[0].publisher_id,
+      type: "chatInvite",
+      session_id
+    }
+  });
+}
+
+//更新
+function updateTaskAndLine(task_id, openId, add_taskline_id) {
+  updateTaskTableAddNum(task_id);
+  updateUserTableAddtaskLineid(openId, add_taskline_id);
 }
 
 //没有任务的新增任务

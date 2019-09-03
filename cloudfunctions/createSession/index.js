@@ -10,7 +10,22 @@ exports.main = async (event, context) => {
   temp = (await db.collection("task_table").where({
     _id: event.taskid
   }).get()).data[0]
-  let sessionid = (await db.collection('chatcontent').add({
+  let sessionid = await addChatcontent(db, wxContext, event)
+
+  await updateLine(db, event, sessionid);
+}
+async function updateLine(db, event, sessionid) {
+  await db.collection('task_line').where({
+    _id: event.link_id
+  }).update({
+    data: {
+      sessionid: sessionid
+    }
+  });
+}
+
+async function addChatcontent(db, wxContext, event) {
+  return (await db.collection('chatcontent').add({
     // data 字段表示需新增的 JSON 数据
     data: {
       finder: {
@@ -26,17 +41,6 @@ exports.main = async (event, context) => {
       status: "init",
       wxstatus: "init"
     }
-  }))._id
-
-  await db.collection('task_line').where(
-    {
-      _id: event.link_id
-    }
-  ).update(
-    {
-      data: {
-        sessionid: sessionid
-      }
-    }
-  )
+  }))._id;
 }
+

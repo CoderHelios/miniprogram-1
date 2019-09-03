@@ -1,5 +1,5 @@
 // 云函数入口文件
-const cloud = require('wx-server-sdk')
+const cloud = require('./node_modules/wx-server-sdk')
 
 cloud.init()
 
@@ -49,7 +49,6 @@ exports.main = async (event, context) => {
     return task;
   } else {
     // visitor is not the owner
-
     const lines = (await db.collection('task_line')
       .where({
         task_id: task._id
@@ -112,55 +111,4 @@ exports.main = async (event, context) => {
       }
     }
   }
-
-
-
-
-
-  // const line = (await db.collection("task_line")
-  // .where(
-  //   {
-  //     _id: event._id
-  //   }
-  // ).get()).data || []
-  // console.log(line)
-
-  // if(line.length == 0)
-  // {
-  //   if(task.consumed_num < 10)
-  //   {
-  //     task.status = "created"
-  //     task.currentLines = []
-  //     task.position = -1
-  //     return task
-  //   }
-  // }
-
-
-  // const lineid = forEach((item) =>
-  // {
-
-  // })
-  // const tasks = await db.collection('task_table')
-  //                 .where({
-  //                   _id: event._id
-  //                 })
-  //                 .get()
-  // const task = tasks.data[0] || null;
-  // if(task.status == "suspect")
-  // {
-
-  // }
-  // if (task) {
-  //   const users = await db.collection('userinfo_table')
-  //     .where({
-  //       openid: task.publish_id
-  //     })
-  //     .get();
-  //   if (users && users.data[0]) {
-  //     task.user = users.data[0];
-  //   }
-  // }
-  // if()
-  // return task;
 }

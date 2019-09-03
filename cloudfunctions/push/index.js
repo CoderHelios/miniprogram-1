@@ -10,9 +10,6 @@ exports.main = async(event, context) => {
   taskid = event.taskid
   const db = cloud.database()
   const _ = db.command
-  //const tmp = (await db.collection('task_table').where({
-  //  _id: event.taskid
-  //}).get()).data[publisher_id]
   let session = (await db.collection('chatcontent').where({
     _id: event.session_id
   }).get()).data[0];
